@@ -16,11 +16,18 @@ Lab1/
 │   ├── requirements.txt
 │   └── README.md
 ├── 02_series_tiempo/
-│   ├── src/            # series.py (construcción de series, ADF, helpers)
+│   ├── src/            # series.py (construcción de series, ADF/KPSS, analiza_serie)
 │   ├── notebooks/      # 02_analisis_preliminar_series.ipynb
 │   ├── requirements.txt
 │   └── README.md
-├── reports/figuras/    # figuras exportadas para el informe
+├── 03_modelado_prediccion/
+│   ├── src/            # modelado.py (ARIMA/SARIMA, Prophet, Holt-Winters, SES, seasonal naive)
+│   ├── notebooks/      # 03_modelado.ipynb  (inciso 4.f-k + ejercicio 5)
+│   ├── requirements.txt
+│   └── README.md
+├── reports/
+│   ├── figuras/         # figuras exportadas para el informe
+│   └── informe_laboratorio1.pdf   # informe final (sin código), para entregar
 ├── docs/               # enunciado del laboratorio (PDF)
 └── README.md
 ```
@@ -32,28 +39,13 @@ El diseño sigue la convención por etapas del repositorio de referencia del cur
 
 ```bash
 python3 -m venv .venv && source .venv/bin/activate
-pip install -r 01_limpieza_eda/requirements.txt
+pip install -r 01_limpieza_eda/requirements.txt -r 03_modelado_prediccion/requirements.txt
 
 # 1) Generar el dataset limpio
 python 01_limpieza_eda/src/limpieza.py
 
-# 2) Ejecutar los cuadernos (EDA y series)
+# 2) Ejecutar los cuadernos, en orden
 jupyter nbconvert --to notebook --execute --inplace 01_limpieza_eda/notebooks/01_eda.ipynb
 jupyter nbconvert --to notebook --execute --inplace 02_series_tiempo/notebooks/02_analisis_preliminar_series.ipynb
+jupyter nbconvert --to notebook --execute --inplace 03_modelado_prediccion/notebooks/03_modelado.ipynb
 ```
-
-## Estado del avance (entrega 23-jul-2026)
-
-- [x] **Análisis exploratorio** general de los datos (cuaderno `01_eda.ipynb`).
-- [x] **División temporal** 70/30 (147 meses entrenamiento / 63 prueba).
-- [x] **Construcción de series**: Total mensual + Vías (3) + Tipo de viajero (4).
-- [x] **Análisis preliminar** de series: gráfico, descomposición, ACF/PACF, prueba ADF
-      y discusión de estacionariedad (Total, Aérea, Terrestre, Turista).
-
-### Pendiente para la entrega final (26-jul-2026)
-Modelos ARIMA/SARIMA y comparación con Prophet, Holt-Winters, suavizamiento exponencial
-y seasonal naïve; predicción sobre el conjunto de prueba; métricas MAE/RMSE/AIC/BIC;
-y análisis comparativo entre categorías.
-
-## Categorías seleccionadas
-Además de la serie obligatoria (Total mensual), se analizan **Vías de ingreso** y **Tipo de viajero**.
