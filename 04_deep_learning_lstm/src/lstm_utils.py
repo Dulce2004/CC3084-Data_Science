@@ -213,6 +213,67 @@ def entrenar_modelo(modelo, X_train, y_train, epochs=200, batch_size=8,
 
 
 # ------------------------------------------------------------------
+# LSTM + características catch22 (ejercicio 2.14): arquitectura de dos
+# ramas -- la secuencia entra a la(s) capa(s) LSTM, y el vector de 22
+# características catch22 de la serie (estandarizado) entra por una rama
+# densa aparte; ambas ramas se concatenan antes de la salida.
+# ------------------------------------------------------------------
+
+def construir_modelo_lstm_catch22(look_back: int, n_feats: int, unidades=(32,),
+                                   dropout: float = 0.0, lr: float = 1e-3,
+                                   unidades_densa: int = 8):
+    from tensorflow import keras
+    from tensorflow.keras import layers
+
+    entrada_seq = keras.Input(shape=(look_back, 1), name="secuencia")
+    x = entrada_seq
+    for i, u in enumerate(unidades):
+        return_seq = i < len(unidades) - 1
+        x = layers.LSTM(u, return_sequences=return_seq)(x)
+        if dropout > 0:
+            x = layers.Dropout(dropout)(x)
+
+    entrada_c22 = keras.Input(shape=(n_feats,), name="catch22")
+    c = layers.Dense(unidades_densa, activation="relu")(entrada_c22)
+
+    combinado = layers.Concatenate()([x, c])
+    salida = layers.Dense(1)(combinado)
+
+    modelo = keras.Model(inputs=[entrada_seq, entrada_c22], outputs=salida)
+    modelo.compile(optimizer=keras.optimizers.Adam(learning_rate=lr), loss="mse")
+    return modelo
+
+
+def entrenar_modelo_catch22(modelo, X_train, feats_train, y_train, epochs=200,
+                             batch_size=8, val_split=0.15, paciencia=20, verbose=0):
+    from tensorflow import keras
+    callback = keras.callbacks.EarlyStopping(
+        monitor="val_loss", patience=paciencia, restore_best_weights=True
+    )
+    hist = modelo.fit(
+        [X_train, feats_train], y_train, epochs=epochs, batch_size=batch_size,
+        validation_split=val_split, callbacks=[callback], verbose=verbose,
+        shuffle=False,
+    )
+    return hist
+
+
+def pronostico_recursivo_catch22(modelo, y_tr_s: np.ndarray, feats_vec: np.ndarray,
+                                  look_back: int, n_pasos: int) -> np.ndarray:
+    """Igual que pronostico_recursivo, pero pasando el vector catch22 (fijo,
+    repetido en cada paso) como segunda entrada del modelo de dos ramas."""
+    secuencia = list(y_tr_s[-look_back:])
+    feats_batch = feats_vec.reshape(1, -1)
+    preds = []
+    for _ in range(n_pasos):
+        x = np.array(secuencia[-look_back:]).reshape(1, look_back, 1)
+        yhat = float(modelo.predict([x, feats_batch], verbose=0)[0, 0])
+        preds.append(yhat)
+        secuencia.append(yhat)
+    return np.array(preds)
+
+
+# ------------------------------------------------------------------
 # Métricas (idénticas a modelado.py del Laboratorio 1, para comparar)
 # ------------------------------------------------------------------
 

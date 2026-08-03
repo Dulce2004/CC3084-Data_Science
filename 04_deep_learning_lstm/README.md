@@ -1,25 +1,28 @@
-# 04 — Deep Learning: Modelos LSTM (Laboratorio 2)
+# 04 — Deep Learning: LSTM y catch22 (Laboratorio 2)
 
-Contiene el **Ejercicio 1** del Laboratorio 2: al menos 2 modelos LSTM (con tuneo de
-hiperparámetros) por serie, para **Total mensual** y **Vía Aérea**, usando los mismos conjuntos de
-entrenamiento/prueba (split temporal 70/30) construidos en el Laboratorio 1
-(`02_series_tiempo/src/series.py`).
+Laboratorio completo: **Ejercicio 1** (modelos LSTM para dos series del Laboratorio 1, con tuneo de
+hiperparámetros y comparación contra los mejores modelos clásicos) y **Ejercicio 2** (similitud
+entre las 8 series construidas en el Laboratorio 1 usando las 22 características de *catch22*: PCA,
+clustering, heatmap, correlación entre características, mapa de distancias, y un LSTM adicional que
+incorpora esas características).
 
 ## Contenido
 
 - `src/lstm_utils.py` — utilidades reutilizables:
   - `preparar_datos_lstm`: transformación log1p + escalado min-max (ajustado solo con
     entrenamiento) + ventanas supervisadas.
-  - `construir_modelo_lstm`: arquitectura LSTM configurable (nº de capas, unidades, dropout,
-    bidireccional, learning rate).
-  - `entrenar_modelo`: entrenamiento con `EarlyStopping`.
-  - `pronostico_recursivo`: pronóstico multi-paso *walk-forward* sobre el conjunto de prueba
-    (el modelo no ve los valores reales de prueba, igual que ARIMA/Prophet/HW en el Lab. 1).
-  - `tunear_lstm`: entrena y evalúa una lista de configuraciones, devuelve tabla ordenada por RMSE.
-- `notebooks/04_lstm_modelos.ipynb` — cuaderno del Ejercicio 1: selección de series, preparación de
-  datos, tuneo (4 configuraciones por serie), selección del mejor modelo, predicción, y comparación
-  contra los mejores modelos clásicos del Laboratorio 1 (recalculados aquí para tener cifras
-  exactas y comparables).
+  - `construir_modelo_lstm` / `entrenar_modelo` / `pronostico_recursivo` / `tunear_lstm`: LSTM
+    "puro" (ejercicio 1), con pronóstico *walk-forward* (igual que ARIMA/Prophet/HW en el Lab. 1).
+  - `construir_modelo_lstm_catch22` / `entrenar_modelo_catch22` / `pronostico_recursivo_catch22`:
+    variante de dos ramas (secuencia + vector catch22) para el ejercicio 2.14.
+- `src/catch22_utils.py` — reimplementación en Python puro (numpy/scipy) de las 22 características
+  de *catch22* (Lubba et al., 2019). **Nota:** el paquete oficial `pycatch22` no tiene *wheels* para
+  Windows y requiere compilar una extensión en C (no hay MSVC/gcc instalado en esta máquina), así
+  que se reimplementaron las 22 características siguiendo las definiciones publicadas.
+- `notebooks/04_lstm_modelos.ipynb` — cuaderno completo: selección de series, preparación de datos,
+  tuneo (4 configuraciones por serie), selección del mejor modelo, predicción y comparación contra
+  el Laboratorio 1 (ejercicio 1); extracción de catch22 para las 8 series, matriz estandarizada,
+  PCA/clustering/heatmap/correlación/distancias, interpretación, y LSTM + catch22 (ejercicio 2).
 
 ## Cómo reproducir
 
@@ -33,11 +36,25 @@ Requiere que `data/processed/migracion_limpia.csv` ya exista (generarlo con
 
 ## Resultados (resumen)
 
-| Serie | Mejor modelo Lab. 1 | RMSE Lab. 1 | Mejor LSTM (este lab.) | RMSE LSTM |
-|---|---|---|---|---|
-| Total mensual | Prophet | 107,270 | LSTM-B (2 capas 64→32, dropout 0.2, look_back 12) | 181,007 |
-| Vía Aérea | SES | 41,350 | LSTM-D (2 capas 32→16, dropout 0.1, look_back 18, lr 5e-4) | 55,424 |
+**Ejercicio 1 — LSTM vs. Laboratorio 1**
 
-En ambas series, los modelos clásicos del Laboratorio 1 siguen superando a los LSTM tuneados aquí
-(ver la discusión completa del ejercicio 1.4 en el notebook). Pendiente para la entrega final:
-Ejercicio 2 (catch22) y la comparación de algoritmos consolidada.
+| Serie | Mejor modelo Lab. 1 | RMSE Lab. 1 | Mejor LSTM (este lab.) | RMSE LSTM | LSTM vs. Lab.1 |
+|---|---|---|---|---|---|
+| Total mensual | Prophet | 107,270 | LSTM-A (1 capa, look_back 12) | 162,502 | +51.5% peor |
+| Vía Aérea | SES | 41,350 | LSTM-D (2 capas 32→16, look_back 18, lr 5e-4) | 55,424 | +34.0% peor |
+
+En ambas series los modelos clásicos del Laboratorio 1 siguen superando a los LSTM tuneados aquí,
+aunque el LSTM es más estable numéricamente que el SARIMA del Lab. 1 en Vía Aérea (ver ejercicio 1.4
+en el notebook).
+
+**Ejercicio 2 — catch22**
+
+Sobre las 8 series (Total, 3 vías, 4 tipos de viajero) el clustering jerárquico (Ward, k=3) sobre las
+22 características catch22 encuentra tres grupos: (1) Total/Vía Aérea/Vía Terrestre/Tipo Turista —
+alto volumen y tendencia fuerte; (2) Vía Marítima/Tipo Cruceristas — caída de pandemia total (-100%)
+y volatilidad alta; (3) Tipo Viajero/Tipo Excursionista — bajo volumen, estacionalidad casi nula. Las
+etiquetas categóricas del Laboratorio 1 (vía, tipo de viajero) **no** predicen bien estos
+agrupamientos: las 3 vías y los 4 tipos quedan repartidos en clusters distintos. El LSTM con
+características catch22 (2.14, sobre Total mensual) no mejoró al mejor LSTM "puro" — al ser un
+vector fijo por serie, no aporta información que varíe entre ventanas de entrenamiento de una sola
+serie. Ver la discusión completa en el notebook y en `reports/informe_laboratorio2.pdf`.
