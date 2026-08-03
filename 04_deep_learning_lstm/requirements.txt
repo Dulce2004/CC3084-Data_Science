@@ -1,0 +1,12 @@
+numpy
+pandas
+matplotlib
+scikit-learn
+statsmodels
+prophet
+tensorflow-cpu
+pycatch22
+openpyxl
+jupyter
+nbformat
+ipykernel
