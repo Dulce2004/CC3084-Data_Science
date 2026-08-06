@@ -1,0 +1,17 @@
+numpy
+pandas
+scipy
+matplotlib
+scikit-learn
+statsmodels
+prophet
+tensorflow-cpu
+openpyxl
+jupyter
+nbformat
+ipykernel
+
+# Nota: pycatch22 no se incluye porque no publica wheels para Windows y requiere
+# compilar una extensión en C (MSVC/gcc), no disponibles en esta máquina. Las 22
+# características de catch22 se reimplementaron en Python puro en
+# 04_deep_learning_lstm/src/catch22_utils.py (solo depende de numpy/scipy).

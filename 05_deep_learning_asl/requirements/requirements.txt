@@ -1,0 +1,11 @@
+numpy
+pandas
+matplotlib
+seaborn
+pillow
+scikit-learn
+opencv-python-headless
+jupytext
+jupyter
+nbconvert
+ipykernel

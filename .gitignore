@@ -1,0 +1,25 @@
+# Entornos
+.venv/
+venv/
+__pycache__/
+*.pyc
+
+# Datos generados (reproducibles)
+data/processed/
+
+# Dataset ASL (pesado, se reproduce con extraer_submuestra.py; no se versiona)
+data/raw/asl_alphabet/
+
+# Red de seguridad: arrays y datasets de imágenes pesados en cualquier ruta bajo data/
+data/**/*.npy
+data/**/*.npz
+data/**/*.jpg
+data/**/*.jpeg
+data/**/*.png
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Sistema
+.DS_Store
+*Zone.Identifier
