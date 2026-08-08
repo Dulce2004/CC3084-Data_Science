@@ -1,0 +1,6 @@
+{
+  "nombre": "CNN_B_profunda_do0.3",
+  "categoria": "CNN",
+  "test_acc": 0.9659003831417624,
+  "test_f1_macro": 0.9657775688076542
+}

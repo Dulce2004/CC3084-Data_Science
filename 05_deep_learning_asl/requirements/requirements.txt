@@ -4,7 +4,8 @@ matplotlib
 seaborn
 pillow
 scikit-learn
-opencv-python-headless
+opencv-python-headless<5
+tensorflow
 jupytext
 jupyter
 nbconvert
