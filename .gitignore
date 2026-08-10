@@ -4,8 +4,9 @@ venv/
 __pycache__/
 *.pyc
 
-# Datos generados (reproducibles)
-data/processed/
+# Datos generados de otros laboratorios (reproducibles; no excluir todo data/processed/ a nivel de
+# carpeta porque impide des-excluir archivos individuales de data/processed/asl_alphabet/ más abajo)
+data/processed/migracion_limpia.csv
 
 # Dataset ASL (pesado, se reproduce con extraer_submuestra.py; no se versiona)
 data/raw/asl_alphabet/
@@ -17,9 +18,29 @@ data/**/*.jpg
 data/**/*.jpeg
 data/**/*.png
 
+# Excepción: fotos propias del grupo para el ejercicio 8 (evidencia del laboratorio, no dataset)
+!data/raw/fotos_propias/
+!data/raw/fotos_propias/*.jpeg
+
+# Excepción: resultados/metadata livianos y reproducibles pero útiles para revisar sin re-ejecutar
+!data/processed/asl_alphabet/
+!data/processed/asl_alphabet/resultados_modelos.csv
+!data/processed/asl_alphabet/clases.json
+!data/processed/asl_alphabet/split_*.csv
+
+# Archivo no relacionado al laboratorio (si existe en data/raw/)
+data/raw/*.xlsx
+
 # Jupyter
 .ipynb_checkpoints/
 
 # Sistema
 .DS_Store
 *Zone.Identifier
+
+# Estado interno de Claude Code (no es parte del proyecto)
+.claude/
+
+# Modelo Random Forest serializado (~400MB, excede el límite de GitHub; se regenera
+# re-ejecutando entrega_final_modelos.ipynb)
+05_deep_learning_asl/models/*.joblib
