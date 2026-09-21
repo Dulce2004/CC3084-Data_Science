@@ -1,0 +1,21 @@
+version: "3.8"
+
+services:
+  pyspark:
+    build: .
+    container_name: pyspark311-jdk17
+    ports:
+      - "8888:8888"
+    volumes:
+      - ./working_dir:/opt/app/working_dir
+      - ./notebooks:/opt/app/notebooks
+    environment:
+      - JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+      - PYSPARK_PYTHON=/usr/local/bin/python
+    command: >
+      jupyter notebook
+      --ip=0.0.0.0
+      --port=8888
+      --no-browser
+      --NotebookApp.token=''
+      --notebook-dir=/opt/app
