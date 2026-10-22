@@ -1,0 +1,15 @@
+# Entornos
+.venv/
+venv/
+__pycache__/
+*.pyc
+
+# Datos generados (reproducibles)
+data/processed/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Sistema
+.DS_Store
+*Zone.Identifier
