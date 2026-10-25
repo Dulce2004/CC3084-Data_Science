@@ -1,0 +1,18 @@
+[theme]
+# Tema claro fijo: la paleta se validó sobre fondo blanco (ver documento de diseño)
+base = "light"
+primaryColor = "#1F3A5F"
+backgroundColor = "#FFFFFF"
+secondaryBackgroundColor = "#EAF0F7"
+textColor = "#1B2430"
+font = "sans-serif"
+baseFontSize = 16
+showWidgetBorder = true
+chartCategoricalColors = ["#2889E2", "#2A9D8F", "#5B5FC7", "#C4571A", "#B7791F", "#A23B72", "#8C6D46"]
+
+[theme.sidebar]
+backgroundColor = "#EAF0F7"
+secondaryBackgroundColor = "#FFFFFF"
+
+[client]
+toolbarMode = "minimal"

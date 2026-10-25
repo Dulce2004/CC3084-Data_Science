@@ -1,8 +1,0 @@
-pandas
-numpy
-matplotlib
-# solo para calcular_datos.py (ya vienen en el repo del Lab 1):
-prophet
-statsmodels
-# solo para abrir/ejecutar el notebook:
-jupyter

@@ -1,7 +1,0 @@
-streamlit>=1.40
-plotly>=5.22
-pandas
-numpy
-statsmodels
-prophet
-openpyxl
