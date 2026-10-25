@@ -1,0 +1,51 @@
+serie,modelo,detalle,MAE,RMSE
+Total,Prophet,intervalo 80%,103594.6,112609.3
+Total,SES,,180251.7,199937.1
+Total,Holt-Winters,tendencia y estacionalidad aditivas,257801.5,278380.4
+Total,Seasonal naive,repite el último año,235304.7,252542.9
+Total,SARIMA manual,"(1, 1, 1)x(1, 1, 1, 12)",246268.2,270637.7
+Total,SARIMA grid-AIC,"(2, 1, 2)x(1, 1, 1, 12)",250324.2,273665.3
+Total,LSTM,"capas (32,), ventana 12 meses (Lab 2)",141568.3,162501.8
+Vía Aérea,Prophet,intervalo 80%,44221.1,49097.4
+Vía Aérea,SES,,36096.7,41349.5
+Vía Aérea,Holt-Winters,tendencia y estacionalidad aditivas,58247.7,62849.8
+Vía Aérea,Seasonal naive,repite el último año,75091.8,79062.5
+Vía Aérea,SARIMA manual,"(1, 1, 1)x(1, 1, 1, 12)",2450648001578860.0,1.748239342244691e+16
+Vía Aérea,SARIMA grid-AIC,"(2, 1, 2)x(1, 1, 0, 12)",8.820626028154251e+20,6.876407216501231e+21
+Vía Aérea,LSTM,"capas (32, 16), ventana 18 meses (Lab 2)",51036.7,55424.2
+Vía Terrestre,Prophet,intervalo 80%,54279.0,71292.4
+Vía Terrestre,SES,,140735.2,156651.9
+Vía Terrestre,Holt-Winters,tendencia y estacionalidad aditivas,175603.7,192196.8
+Vía Terrestre,Seasonal naive,repite el último año,160011.8,176651.3
+Vía Terrestre,SARIMA manual,"(1, 1, 1)x(1, 0, 1, 12)",165811.5,182072.3
+Vía Terrestre,SARIMA grid-AIC,"(0, 1, 1)x(1, 0, 1, 12)",165277.5,181595.6
+Vía Marítima,Prophet,intervalo 80%,7622.5,8967.1
+Vía Marítima,SES,,445.2,603.6
+Vía Marítima,Holt-Winters,tendencia y estacionalidad aditivas,478.5,674.1
+Vía Marítima,Seasonal naive,repite el último año,445.2,603.6
+Vía Marítima,SARIMA manual,"(1, 1, 1)x(1, 1, 1, 12)",445.2,603.6
+Vía Marítima,SARIMA grid-AIC,"(0, 1, 2)x(1, 1, 1, 12)",445.2,603.6
+Turista,Prophet,intervalo 80%,131321.6,142574.3
+Turista,SES,,116862.4,128462.8
+Turista,Holt-Winters,tendencia y estacionalidad aditivas,160306.6,173043.5
+Turista,Seasonal naive,repite el último año,155595.9,164445.3
+Turista,SARIMA manual,"(1, 1, 1)x(1, 1, 1, 12)",164500.7,178125.5
+Turista,SARIMA grid-AIC,"(0, 1, 0)x(1, 1, 0, 12)",165987.9,181563.7
+Excursionista,Prophet,intervalo 80%,15617.3,22407.5
+Excursionista,SES,,51497.4,56873.8
+Excursionista,Holt-Winters,tendencia y estacionalidad aditivas,53815.9,59054.5
+Excursionista,Seasonal naive,repite el último año,51857.2,56913.2
+Excursionista,SARIMA manual,"(1, 1, 1)x(1, 0, 1, 12)",53394.0,58596.4
+Excursionista,SARIMA grid-AIC,"(2, 1, 2)x(0, 0, 1, 12)",52719.6,57973.0
+Viajero,Prophet,intervalo 80%,22924.8,31873.3
+Viajero,SES,,19468.9,35143.1
+Viajero,Holt-Winters,tendencia y estacionalidad aditivas,23234.5,34638.0
+Viajero,Seasonal naive,repite el último año,28208.0,42001.8
+Viajero,SARIMA manual,"(1, 1, 1)x(1, 0, 1, 12)",28744.8,41434.1
+Viajero,SARIMA grid-AIC,"(1, 1, 2)x(0, 0, 1, 12)",28726.1,41415.8
+Cruceristas,Prophet,intervalo 80%,8334.1,10002.6
+Cruceristas,SES,,21106.6,22684.0
+Cruceristas,Holt-Winters,tendencia y estacionalidad aditivas,15372.2,17561.2
+Cruceristas,Seasonal naive,repite el último año,6970.4,10090.9
+Cruceristas,SARIMA manual,"(1, 1, 1)x(1, 1, 1, 12)",15636.3,24094.1
+Cruceristas,SARIMA grid-AIC,"(0, 1, 2)x(0, 1, 1, 12)",15755.3,24276.5
