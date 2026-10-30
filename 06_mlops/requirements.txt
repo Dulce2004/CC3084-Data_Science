@@ -1,0 +1,8 @@
+# Entorno del flujo MLOps (Laboratorio 11). Versiones fijadas para que una
+# ejecución sea reproducible; se registran además en los metadatos de cada corrida.
+pandas==2.3.1
+numpy==2.3.2
+statsmodels==0.14.6
+PyYAML==6.0.3
+openpyxl==3.1.5
+pytest==9.2.0
