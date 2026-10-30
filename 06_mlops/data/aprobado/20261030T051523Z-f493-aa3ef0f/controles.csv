@@ -1,0 +1,7 @@
+control,verifica,nivel,estado,detiene_ejecucion,filas_afectadas,detalle
+1. columnas_tipos,columnas indispensables presentes y con tipo compatible,critico,ok,False,0,8 columnas indispensables verificadas
+2. fechas_cobertura,fechas válidas y cobertura completa del rango configurado,critico,ok,False,0,210 meses con información; cobertura configurada 2009-01 a 2026-06 (210 meses)
+3. unicidad,sin filas repetidas según la clave de la granularidad declarada,critico,ok,False,0,clave: Año + Mes cod + Vía + Frontera + País + Tipo de Viajero + Agrupación Residencia; 0 filas duplicadas (0.0000%)
+4. valores_faltantes,sin ausencias en las columnas necesarias para estimar,critico,ok,False,0,sin ausencias en columnas indispensables
+5. valores_denominadores,conteos no negativos y finitos; denominadores distintos de cero,critico,ok,False,0,"sin conteos negativos ni no finitos; denominador del reparto (01 La Aurora, Turista) con 210 meses"
+6. regla_metodologica,"serie mensual de fuente mensual, sin duplicar visitantes y factor de reparto en rango",critico,ok,False,0,"fuente mensual (Año + Mes cod, máx. 12 meses por año); 4 puestos del destino disjuntos de 01 La Aurora; factor de reparto 0.12"

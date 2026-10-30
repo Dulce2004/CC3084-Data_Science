@@ -1,0 +1,17 @@
+{
+  "run_id": "20261030T051523Z-f493-aa3ef0f",
+  "carpeta": "06_mlops/data/aprobado/20261030T051523Z-f493-aa3ef0f",
+  "destino": "Petén / Mundo Maya",
+  "version_procedimiento": "1.0.0",
+  "fecha_publicacion": "2026-10-30T05:15:49+00:00",
+  "version_anterior": "20261030T051453Z-a0f2-aa3ef0f",
+  "periodo_estimado": "2026-01-01 a 2026-06-01",
+  "metrica_validacion": {
+    "MAE": 3110.0,
+    "RMSE": 3669.0,
+    "error_relativo": 0.1295,
+    "MAPE": 0.1264,
+    "nota_mape": "",
+    "meses_evaluados": 6
+  }
+}

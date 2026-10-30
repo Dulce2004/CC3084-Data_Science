@@ -1,0 +1,7 @@
+destino,codigo_destino,periodo,valor,unidad,tipo_valor,valor_observado,run_id,fecha_generacion,version_procedimiento
+Petén / Mundo Maya,PETEN,2026-01,24397.1,viajeros por mes,estimado,23642.6,20261030T051453Z-a0f2-aa3ef0f,2026-10-30T05:15:22+00:00,1.0.0
+Petén / Mundo Maya,PETEN,2026-02,20132.6,viajeros por mes,estimado,21442.7,20261030T051453Z-a0f2-aa3ef0f,2026-10-30T05:15:22+00:00,1.0.0
+Petén / Mundo Maya,PETEN,2026-03,22670.3,viajeros por mes,estimado,26394.8,20261030T051453Z-a0f2-aa3ef0f,2026-10-30T05:15:22+00:00,1.0.0
+Petén / Mundo Maya,PETEN,2026-04,21519.2,viajeros por mes,estimado,23638.0,20261030T051453Z-a0f2-aa3ef0f,2026-10-30T05:15:22+00:00,1.0.0
+Petén / Mundo Maya,PETEN,2026-05,18425.0,viajeros por mes,estimado,22723.7,20261030T051453Z-a0f2-aa3ef0f,2026-10-30T05:15:22+00:00,1.0.0
+Petén / Mundo Maya,PETEN,2026-06,19847.2,viajeros por mes,estimado,26300.3,20261030T051453Z-a0f2-aa3ef0f,2026-10-30T05:15:22+00:00,1.0.0

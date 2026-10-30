@@ -1,0 +1,21 @@
+2026-10-29 23:15:23 | INFO       | ejecución 20261030T051523Z-f493-aa3ef0f — inicio 2026-10-30T05:15:23+00:00
+2026-10-29 23:15:48 | INFO       | [etapa] lectura — 161,036 filas de C:\github\CC3084-Data_Science\data\raw\Base_Migracion_2009-2026jun.xlsx (sha256 cdaba77918ae…)
+2026-10-29 23:15:48 | INFO       | control 1. columnas_tipos: ok — 8 columnas indispensables verificadas
+2026-10-29 23:15:48 | INFO       | control 2. fechas_cobertura: ok — 210 meses con información; cobertura configurada 2009-01 a 2026-06 (210 meses)
+2026-10-29 23:15:48 | INFO       | control 3. unicidad: ok — clave: Año + Mes cod + Vía + Frontera + País + Tipo de Viajero + Agrupación Residencia; 0 filas duplicadas (0.0000%)
+2026-10-29 23:15:48 | INFO       | control 4. valores_faltantes: ok — sin ausencias en columnas indispensables
+2026-10-29 23:15:48 | INFO       | control 5. valores_denominadores: ok — sin conteos negativos ni no finitos; denominador del reparto (01 La Aurora, Turista) con 210 meses
+2026-10-29 23:15:48 | INFO       | control 6. regla_metodologica: ok — fuente mensual (Año + Mes cod, máx. 12 meses por año); 4 puestos del destino disjuntos de 01 La Aurora; factor de reparto 0.12
+2026-10-29 23:15:48 | INFO       | [etapa] validacion — 6 ok, 0 advertencias, 0 errores
+2026-10-29 23:15:48 | INFO       | [etapa] preparacion — serie del destino con 210 meses; ajuste 204 meses, evaluación 6 meses
+2026-10-29 23:15:49 | INFO       | [etapa] ajuste — holt_winters (tendencia y estacionalidad aditivas, período 12) sobre 204 meses hasta 2025-12-01
+2026-10-29 23:15:49 | INFO       | [etapa] evaluacion — MAE 3,110.0 | RMSE 3,669.0 | error relativo 12.9% sobre 6 meses
+2026-10-29 23:15:49 | INFO       | [etapa] almacenamiento — 06_mlops/data/resultados/20261030T051523Z-f493-aa3ef0f
+2026-10-29 23:15:49 | INFO       | [aceptación] cumple: controles críticos sin error — controles en error: ninguno
+2026-10-29 23:15:49 | INFO       | [aceptación] cumple: salidas completas — 6 de 6 meses estimados, 0 valores vacíos
+2026-10-29 23:15:49 | INFO       | [aceptación] cumple: MAE ≤ 12,000 viajeros/mes — MAE del procedimiento: 3,110.0
+2026-10-29 23:15:49 | INFO       | [aceptación] cumple: error relativo ≤ 35% — error relativo del procedimiento: 12.9%
+2026-10-29 23:15:49 | INFO       | [aceptación] MAE procedimiento 3,110.0 contra referencia (promedio_historico) 4,264.4; el procedimiento supera a la referencia
+2026-10-29 23:15:49 | INFO       | [publicación] versión 20261030T051523Z-f493-aa3ef0f aprobada y publicada en 06_mlops\data\aprobado\20261030T051523Z-f493-aa3ef0f; versión anterior conservada: 20261030T051453Z-a0f2-aa3ef0f
+2026-10-29 23:15:49 | INFO       | [etapa] publicacion — versión vigente 20261030T051523Z-f493-aa3ef0f
+2026-10-29 23:15:49 | INFO       | estado final: aprobada | publicación: publicada (20261030T051523Z-f493-aa3ef0f) | 26.55 s | advertencias: 0 | errores: 0

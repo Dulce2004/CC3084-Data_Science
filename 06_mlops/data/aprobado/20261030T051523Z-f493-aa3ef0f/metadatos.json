@@ -1,0 +1,149 @@
+{
+  "run_id": "20261030T051523Z-f493-aa3ef0f",
+  "destino": "Petén / Mundo Maya",
+  "codigo_destino": "PETEN",
+  "version_procedimiento": "1.0.0",
+  "commit_git": "aa3ef0f8453d70ae7d7013aa0052436e15291677-sucio",
+  "configuracion": {
+    "archivo": "06_mlops/config/pipeline.yaml",
+    "huella_sha256": "e1afcc4594b2cf50b3c132cf412e93296286b1369af44707ae937d385e3af49e"
+  },
+  "semilla": 20261029,
+  "dependencias": {
+    "python": "3.13.5",
+    "plataforma": "Windows-11-10.0.26200-SP0",
+    "pandas": "2.3.1",
+    "numpy": "2.3.2",
+    "statsmodels": "0.14.6",
+    "PyYAML": "6.0.3",
+    "openpyxl": "3.1.5"
+  },
+  "procedimiento": {
+    "variable": "viajeros_destino",
+    "definicion": "viajeros internacionales que ingresan al destino en el mes, estimados como entradas directas más el factor de reparto aplicado a los turistas del puesto aéreo base",
+    "unidad": "viajeros por mes",
+    "agregacion": "mes × destino",
+    "formula": "V(m) = D(m) + f * A(m)",
+    "puestos_destino": [
+      "02 Mundo Maya",
+      "17 El Naranjo",
+      "18 Bethel",
+      "20 Melchor de Mencos"
+    ],
+    "tipos_destino": [
+      "Turista",
+      "Excursionista"
+    ],
+    "puesto_reparto": "01 La Aurora",
+    "tipos_reparto": [
+      "Turista"
+    ],
+    "factor_reparto": 0.12,
+    "factor_reparto_rango": [
+      0.08,
+      0.18
+    ]
+  },
+  "periodo_ajuste": "2009-01-01 a 2025-12-01",
+  "periodo_evaluacion": "2026-01-01 a 2026-06-01",
+  "limitaciones_validacion": [
+    "La fuente actual ya trae los meses evaluados; al ocultarlos se reproduce la ausencia de valor observado, pero no el resto del estado de la fuente en esa fecha (revisiones posteriores de meses anteriores ya están incorporadas).",
+    "El tramo de ajuste termina en 2025-12-01 y la evaluación cubre 2026-01-01 a 2026-06-01: la estimación de cada mes se hace con el mismo ajuste, no reestimando el procedimiento mes a mes.",
+    "El factor de reparto es un supuesto fijo del observatorio; en enero y febrero de 2026 no se dispone de un valor calibrado del período, así que el error medido mezcla el error del procedimiento con el del supuesto.",
+    "No se calculan errores para meses sin valor observado comparable: si la fuente no trae el mes, queda sin métrica en lugar de compararse contra cero."
+  ],
+  "fuente": {
+    "nombre": "Base de Migración (fuente mensual)",
+    "ruta": "C:\\github\\CC3084-Data_Science\\data\\raw\\Base_Migracion_2009-2026jun.xlsx",
+    "formato": "xlsx",
+    "hoja": "Datos",
+    "huella_sha256": "cdaba77918ae889c847ba8459503f9cce2441efac41b3d3aa0f05ac9ab283846",
+    "bytes": 9743464,
+    "filas": 161036,
+    "columnas": [
+      "Año",
+      "Mes cod",
+      "Mes",
+      "Vía",
+      "Frontera",
+      "País",
+      "Región",
+      "Región dos",
+      "Regiones OMT",
+      "MCEO",
+      "Agrupación Residencia",
+      "Tipo de Viajero",
+      "Viajero"
+    ],
+    "granularidad": "mes x vía x frontera x país x tipo de viajero"
+  },
+  "controles": {
+    "n_controles": 6,
+    "n_ok": 6,
+    "n_advertencias": 0,
+    "n_errores": 0,
+    "detiene": false,
+    "controles_en_error": []
+  },
+  "serie": {
+    "meses": 210,
+    "meses_sin_cobertura": 0,
+    "promedio_mensual": 20038.228455386507,
+    "aporte_directas": 1930886.3018905239,
+    "aporte_reparto": 2277141.673740643
+  },
+  "ajuste": {
+    "modelo": "holt_winters",
+    "detalle": "tendencia y estacionalidad aditivas, período 12",
+    "parametros": {
+      "smoothing_level": 0.7633128557058552,
+      "smoothing_trend": 0.008642846514402058,
+      "smoothing_seasonal": 0.0,
+      "damping_trend": null,
+      "initial_level": 18696.750067551628,
+      "initial_trend": -413.04493117789167,
+      "use_boxcox": 0.0,
+      "remove_bias": 0.0
+    },
+    "referencia_nombre": "promedio_historico",
+    "n_ajuste": 204,
+    "ajuste_inicio": "2009-01-01",
+    "ajuste_fin": "2025-12-01"
+  },
+  "metrica_validacion": {
+    "MAE": 3110.0,
+    "RMSE": 3669.0,
+    "error_relativo": 0.1295,
+    "MAPE": 0.1264,
+    "nota_mape": "",
+    "meses_evaluados": 6
+  },
+  "aceptacion": {
+    "aprobada": true,
+    "condiciones": [
+      {
+        "condicion": "controles críticos sin error",
+        "cumple": true,
+        "detalle": "controles en error: ninguno"
+      },
+      {
+        "condicion": "salidas completas",
+        "cumple": true,
+        "detalle": "6 de 6 meses estimados, 0 valores vacíos"
+      },
+      {
+        "condicion": "MAE ≤ 12,000 viajeros/mes",
+        "cumple": true,
+        "detalle": "MAE del procedimiento: 3,110.0"
+      },
+      {
+        "condicion": "error relativo ≤ 35%",
+        "cumple": true,
+        "detalle": "error relativo del procedimiento: 12.9%"
+      }
+    ],
+    "no_cumplidas": [],
+    "supera_referencia": true,
+    "comparacion_referencia": "MAE procedimiento 3,110.0 contra referencia (promedio_historico) 4,264.4"
+  }
+}
