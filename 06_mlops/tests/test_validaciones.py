@@ -182,3 +182,9 @@ def test_un_control_roto_queda_en_error_y_no_aprueba(datos, cfg, monkeypatch):
 @pytest.mark.parametrize("control", [c.__name__ for c in val.CONTROLES])
 def test_el_nivel_de_cada_control_viene_de_la_configuracion(control, cfg):
     assert cfg.nivel_control(control.replace("control_", "")) == "critico"
+
+
+def test_control5_no_lanza_excepcion_si_falta_la_columna_viajero(datos, cfg):
+    """Bug real: antes lanzaba AttributeError en vez de reportar un error limpio."""
+    r = val.control_valores_denominadores(datos.drop(columns=["Viajero"]), cfg)
+    assert r.estado == val.ERROR and r.detiene

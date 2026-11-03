@@ -1,0 +1,14 @@
+.git/
+**/__pycache__/
+**/*.pyc
+.venv*/
+venv/
+data/raw/
+data/processed/
+06_mlops/data/
+06_mlops/logs/
+06_mlops/mlruns/
+05_dashboard_interactivo/.streamlit/secrets.toml
+reports/
+docs/
+.claude/

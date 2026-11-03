@@ -4,10 +4,9 @@ Flujo reproducible que estima el ingreso mensual de viajeros internacionales al 
 **Petén / Mundo Maya** y publica una versión aprobada para que la consulte el tablero del
 Laboratorio 10.
 
-Este es el **avance** del Laboratorio 11 (entrega del 29-oct-2026): alcance, diagrama, pipeline
-inicial y los seis controles de calidad funcionando. El registro en MLflow, el monitoreo
-automático y la contenerización con Docker quedan para la entrega final (1-nov-2026); la
-estructura ya los contempla.
+Entrega completa del Laboratorio 11: alcance, diagrama, pipeline reproducible, los seis controles
+de calidad, registro de ejecuciones en MLflow, integración con el tablero, monitoreo y
+recuperación, y despliegue local con Docker.
 
 *Datos de uso exclusivamente académico; no son cifras oficiales del INGUAT ni del IGM.*
 
@@ -77,7 +76,7 @@ python 06_mlops/src/pipeline.py --solo-validar
 python 06_mlops/src/pipeline.py --sin-publicar
 
 # deja vigente una versión aprobada anterior
-python 06_mlops/src/pipeline.py --restaurar 20261030T050644Z-6da9-942c1b0
+python 06_mlops/src/pipeline.py --restaurar 20261103T032329Z-3399-descono
 
 # pruebas
 python -m pytest 06_mlops/tests -q
@@ -128,7 +127,7 @@ evidente. La regla se aplica tal como está escrita y no se modifica después de
 ## Resultados del avance
 
 Dos ejecuciones completas con los mismos datos y la misma configuración
-(`20261030T050644Z-6da9-942c1b0` y `20261030T050712Z-3df2-942c1b0`):
+(`20261103T032329Z-3399-descono` y `20261030T050712Z-3df2-942c1b0`):
 
 | | Procedimiento (Holt-Winters) | Referencia (promedio histórico) |
 |---|---|---|
@@ -163,26 +162,125 @@ avisar registros que la fuente distingue.
 │   ├── evaluacion.py      etapa 5: métricas y regla de aceptación
 │   ├── publicacion.py     etapas 6 y 7: expediente, publicación y restauración
 │   ├── registro.py        run_id, bitácora por ejecución e historial
+│   ├── seguimiento.py     registro de cada ejecución en MLflow Tracking
+│   ├── monitoreo.py       las tres verificaciones de monitoreo, sobre el historial
 │   └── diagrama.py        genera la figura del flujo
-├── tests/                 52 pruebas: controles, flujo, fallo controlado y recuperación
+├── tests/                 61 pruebas: controles, flujo, fallo/recuperación, monitoreo
 ├── data/
 │   ├── resultados/<run_id>/   expediente de cada ejecución (aprobada o no)
 │   ├── aprobado/<run_id>/     versiones aprobadas conservadas
 │   ├── aprobado/version_actual.json   puntero a la versión vigente
 │   └── historial_ejecuciones.jsonl    una línea por ejecución
 ├── logs/<run_id>.log      bitácora: inicio, fin, etapas, advertencias, errores, publicación
+├── mlruns/                base SQLite de MLflow + artefactos (persiste fuera de Docker)
+├── Dockerfile             imagen del pipeline y del monitoreo
 ├── requirements.txt
 ├── codebook.md
 └── README.md
 ```
 
-## Pendiente para la entrega final
+## Registro en MLflow Tracking (ejercicio 4)
 
-- Registro de ejecuciones en MLflow Tracking (ejercicio 4).
-- Integración visual con el tablero: distinguir observado de estimado, mostrar fecha de
-  actualización y métrica de validación (ejercicio 5).
-- Verificaciones de monitoreo —actualización, calidad y resultados— sobre el historial (ejercicio 6).
-- Docker y Docker Compose con persistencia de MLflow y de las versiones aprobadas (ejercicio 7).
+Cada ejecución crea (o reutiliza) el experimento `observatorio-peten-mundo-maya` y registra un run
+con: identificador y commit de Git (tags), huella de la fuente y de la configuración, períodos de
+ajuste y evaluación, parámetros del procedimiento (incluido el factor de reparto), parámetros
+ajustados del modelo, métricas de evaluación, resumen de los controles de calidad, resultado de la
+regla de aceptación y el expediente completo (`estimaciones.csv`, `metricas.csv`, `controles.csv`,
+`metadatos.json`, `pipeline.yaml`) como artefactos. Se registra también cuando la ejecución se
+rechaza, se detiene o falla — la causa queda en las tags y en los artefactos, nunca se inventan
+métricas para una evaluación que no llegó a correr.
+
+El registro es un efecto adicional: si MLflow no está disponible, queda como advertencia en la
+bitácora y el pipeline sigue (los resultados locales no dependen de MLflow).
+
+```bash
+# tracking local (SQLite en 06_mlops/mlruns/) y consulta con la interfaz web
+python 06_mlops/src/pipeline.py
+mlflow ui --backend-store-uri sqlite:///06_mlops/mlruns/mlflow.db
+```
+
+Dos ejecuciones con los mismos datos y configuración (ver `06_mlops/mlruns/`) registran MAE y RMSE
+idénticos: `MAE=3,110.0`, `RMSE=3,669.0`, `error_relativo=0.1295`, `fuente_sha256` igual en ambas,
+lo que confirma la reproducibilidad del procedimiento (determinista, semilla fija).
+
+## Integración con el tablero (ejercicio 5)
+
+El tablero del Laboratorio 10 (`05_dashboard_interactivo`) agrega la página **Petén / Mundo Maya**
+(`src/app_pages/peten.py`), que lee únicamente `06_mlops/data/aprobado/version_actual.json` y la
+carpeta que señala — nunca ejecuta el pipeline ni ajusta nada. Muestra:
+
+- la fecha de la última actualización y la versión del procedimiento;
+- el error típico de validación (MAE) con una explicación breve de qué significa y sobre cuántos
+  meses se calculó;
+- una gráfica con lo **observado** (línea azul sólida) y lo **estimado** (línea naranja punteada)
+  para el mismo mes, siguiendo el significado de color fijo del documento de diseño del Lab. 10;
+- una advertencia sobre las limitaciones del factor de reparto.
+
+Si todavía no existe una versión aprobada, la página lo dice explícitamente
+("las estimaciones no están disponibles") en vez de mostrar datos vacíos o inventados. Los detalles
+técnicos (parámetros, huellas, commit) quedan en MLflow y en `06_mlops/`, no en la interfaz.
+
+## Monitoreo y recuperación (ejercicio 6)
+
+```bash
+python 06_mlops/src/monitoreo.py --config 06_mlops/config/pipeline.yaml
+```
+
+Lee el historial de ejecuciones y compara la última corrida contra la versión aprobada vigente,
+sin volver a tocar la fuente. Tres verificaciones (`06_mlops/src/monitoreo.py`):
+
+| Verificación | Qué compara | Genera alerta cuando |
+|---|---|---|
+| `actualizacion` | último mes estimado vs. `monitoreo.mes_esperado` | la fuente o las estimaciones no llegan al período esperado |
+| `calidad` | `controles.csv` de esta ejecución vs. la versión aprobada anterior | aparece un control en error que antes pasaba (o sigue en error) |
+| `resultados` | estimaciones negativas/no finitas y variación mes a mes contra el umbral configurado | hay valores inválidos o una variación sobre `monitoreo.variacion_mensual_max` |
+
+Una variación alta genera una alerta para revisión; por sí sola no concluye que el procedimiento
+perdió precisión, y el error predictivo (MAE/RMSE) solo se actualiza cuando hay observación
+comparable — igual que en la etapa de evaluación.
+
+**Prueba controlada de fallo y recuperación** (con datos sintéticos, `tests/test_pipeline.py` y
+`tests/test_monitoreo.py`): se publica una versión aprobada; se introduce un problema (columna
+ausente, clave duplicada, denominador en cero); se corre el pipeline y se comprueba que (a) el
+control correspondiente lo detecta, (b) el pipeline se detiene sin reemplazar lo publicado, (c) la
+versión aprobada anterior sigue disponible, (d) el monitoreo de calidad marca el control nuevo en
+error. Se corrige el problema y se vuelve a ejecutar: la nueva versión se aprueba y se publica.
+
+**Restauración de una versión anterior:**
+
+```bash
+python 06_mlops/src/pipeline.py --restaurar 20261103T030301Z-b930-45ad69b
+```
+
+Reescribe únicamente el puntero `version_actual.json`; no copia ni regenera nada, así que es
+inmediata y el tablero la consulta en la siguiente recarga.
+
+## Docker (ejercicio 7)
+
+```bash
+docker compose up -d --build        # levanta mlflow (puerto 5000) y el tablero (puerto 8501)
+docker compose run --rm pipeline    # corre el flujo una vez
+docker compose run --rm monitor     # corre el monitoreo sobre la última ejecución
+docker compose down                 # detiene los servicios; los datos persisten
+```
+
+| Servicio | Qué hace | Puerto |
+|---|---|---|
+| `mlflow` | servidor de MLflow Tracking (backend SQLite) | 5000 |
+| `pipeline` | corre `06_mlops/src/pipeline.py` una vez (perfil `tools`, no se levanta con `up`) | — |
+| `monitor` | corre `06_mlops/src/monitoreo.py` una vez (perfil `tools`) | — |
+| `tablero` | tablero Streamlit, incluida la página Petén / Mundo Maya | 8501 |
+
+Los datos institucionales **no se copian a las imágenes**: `data/raw/` se monta de solo lectura
+desde el host (`OBS_DATOS_CRUDOS` apunta a la ruta montada). `06_mlops/data/`, `06_mlops/logs/` y
+`06_mlops/mlruns/` se montan como volumen, así que las versiones aprobadas y los registros de
+MLflow persisten aunque se borren y recreen los contenedores (`docker compose down && docker
+compose up -d --build` no pierde nada). El tablero monta `06_mlops/data/aprobado` de solo lectura:
+nunca escribe la versión aprobada, solo la consulta.
+
+Para comprobarlo desde una copia limpia del repositorio: clonar, colocar
+`data/raw/Base_Migracion_2009-2026jun.xlsx`, y correr los tres comandos de arriba sin ningún paso
+manual adicional.
 
 ## Equipo
 

@@ -1,0 +1,73 @@
+# Observatorio de Inteligencia Turística — despliegue local (Laboratorio 11).
+#
+#   docker compose up -d --build        # levanta mlflow y el tablero
+#   docker compose run --rm pipeline    # corre el flujo una vez (lectura -> publicación)
+#   docker compose run --rm monitor     # corre el monitoreo sobre la última ejecución
+#   docker compose down                 # detiene los servicios (los datos persisten)
+#
+# Los datos institucionales NUNCA se copian a las imágenes: se montan desde
+# ./data/raw. Los registros de MLflow y las versiones aprobadas viven en
+# ./06_mlops/mlruns y ./06_mlops/data, montados como volumen, así que sobreviven
+# a `docker compose down` / `up` y a recrear los contenedores.
+
+services:
+  mlflow:
+    build:
+      context: .
+      dockerfile: 06_mlops/Dockerfile
+    container_name: observatorio-mlflow
+    # --allowed-hosts "*": MLflow 3.x valida el header Host contra DNS rebinding;
+    # sin esto rechaza las peticiones que llegan con el nombre del servicio
+    # ("mlflow:5000") en vez de "localhost". Es una red Docker interna, no expuesta
+    # más que por el puerto publicado, así que "*" es razonable aquí.
+    command: >
+      mlflow server
+        --backend-store-uri sqlite:///06_mlops/mlruns/mlflow.db
+        --default-artifact-root /app/06_mlops/mlruns/artifacts
+        --host 0.0.0.0 --port 5000
+        --allowed-hosts "*"
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./06_mlops/mlruns:/app/06_mlops/mlruns
+
+  pipeline:
+    build:
+      context: .
+      dockerfile: 06_mlops/Dockerfile
+    container_name: observatorio-pipeline
+    profiles: ["tools"]        # no se levanta con `up`; se invoca con `run`
+    environment:
+      - OBS_DATOS_CRUDOS=/app/data/raw/Base_Migracion_2009-2026jun.xlsx
+      - MLFLOW_TRACKING_URI=http://mlflow:5000
+    depends_on:
+      - mlflow
+    volumes:
+      - ./data/raw:/app/data/raw:ro
+      - ./06_mlops/data:/app/06_mlops/data
+      - ./06_mlops/logs:/app/06_mlops/logs
+      - ./06_mlops/mlruns:/app/06_mlops/mlruns
+
+  monitor:
+    build:
+      context: .
+      dockerfile: 06_mlops/Dockerfile
+    container_name: observatorio-monitor
+    profiles: ["tools"]
+    command: ["python", "06_mlops/src/monitoreo.py", "--config", "06_mlops/config/pipeline.yaml"]
+    volumes:
+      - ./data/raw:/app/data/raw:ro
+      - ./06_mlops/data:/app/06_mlops/data
+      - ./06_mlops/logs:/app/06_mlops/logs
+      - ./06_mlops/mlruns:/app/06_mlops/mlruns
+
+  tablero:
+    build:
+      context: .
+      dockerfile: 05_dashboard_interactivo/Dockerfile
+    container_name: observatorio-tablero
+    ports:
+      - "8501:8501"
+    volumes:
+      # Solo lectura: el tablero nunca escribe la versión aprobada, solo la consulta.
+      - ./06_mlops/data/aprobado:/app/06_mlops/data/aprobado:ro

@@ -1,0 +1,24 @@
+{
+  "run_id": "20261103T032418Z-2d09-descono",
+  "n_alertas": 0,
+  "verificaciones": [
+    {
+      "verificacion": "actualizacion",
+      "descripcion": "la fuente y las estimaciones cubren el último período esperado",
+      "estado": "ok",
+      "detalle": "última estimación 2026-06 (esperado 2026-06 o posterior)"
+    },
+    {
+      "verificacion": "calidad",
+      "descripcion": "sin cambios relevantes en faltantes, duplicados o cobertura respecto a la última versión aprobada",
+      "estado": "ok",
+      "detalle": "sin errores; 0 advertencias (ninguna)"
+    },
+    {
+      "verificacion": "resultados",
+      "descripcion": "sin estimaciones negativas o no finitas, ni variaciones fuera de umbral",
+      "estado": "ok",
+      "detalle": "sin negativos, no finitos, ni variaciones sobre 60%"
+    }
+  ]
+}

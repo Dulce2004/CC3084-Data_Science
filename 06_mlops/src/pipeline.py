@@ -41,6 +41,7 @@ import modelo as mdl             # noqa: E402
 import preparacion as prep       # noqa: E402
 import publicacion as pub        # noqa: E402
 import registro as reg           # noqa: E402
+import seguimiento as mlf        # noqa: E402
 import validaciones as val       # noqa: E402
 
 PAQUETES = ["pandas", "numpy", "statsmodels", "PyYAML", "openpyxl"]
@@ -188,17 +189,21 @@ def ejecutar(cfg, solo_validar: bool = False, publicar: bool = True) -> dict:
             bitacora.info("versión vigente: " +
                           (vigente["run_id"] if vigente
                            else "ninguna; las estimaciones no están disponibles"))
+            mlf.registrar_ejecucion(cfg, run_id, "rechazada", metadatos, carpeta, bitacora)
             return bitacora.cerrar("rechazada", {"carpeta": str(carpeta), **metadatos.get(
                 "metrica_validacion", {})}, historial)
 
         if not publicar:
             bitacora.publicacion = "no intentada (--sin-publicar)"
+            mlf.registrar_ejecucion(cfg, run_id, "aprobada_sin_publicar", metadatos, carpeta,
+                                    bitacora)
             return bitacora.cerrar("aprobada_sin_publicar", {"carpeta": str(carpeta)},
                                    historial)
 
         puntero = pub.publicar(cfg, run_id, carpeta, metadatos, bitacora)
         bitacora.etapa("publicacion", f"versión vigente {puntero['run_id']}")
         bitacora.publicacion = f"publicada ({puntero['run_id']})"
+        mlf.registrar_ejecucion(cfg, run_id, "aprobada", metadatos, carpeta, bitacora)
         return bitacora.cerrar("aprobada", {"carpeta": str(carpeta),
                                             "version_anterior": puntero["version_anterior"],
                                             **metadatos["metrica_validacion"]}, historial)
@@ -214,17 +219,21 @@ def ejecutar(cfg, solo_validar: bool = False, publicar: bool = True) -> dict:
         bitacora.info("versión vigente: " +
                       (vigente["run_id"] if vigente
                        else "ninguna; las estimaciones no están disponibles"))
+        mlf.registrar_ejecucion(cfg, run_id, "detenida", metadatos, carpeta, bitacora)
         return bitacora.cerrar("detenida", {"carpeta": str(carpeta)}, historial)
 
     except Exception as exc:                        # error inesperado: mismo trato
         bitacora.error(f"error inesperado: {exc!r}")
         bitacora.publicacion = "no se reemplazaron los resultados publicados"
         metadatos["error"] = repr(exc)
+        carpeta = None
         try:
-            pub.guardar_ejecucion(cfg, run_id, None, None,
-                                  reporte.tabla() if reporte else pd.DataFrame(), metadatos)
+            carpeta = pub.guardar_ejecucion(cfg, run_id, None, None,
+                                            reporte.tabla() if reporte else pd.DataFrame(),
+                                            metadatos)
         except Exception:
             pass
+        mlf.registrar_ejecucion(cfg, run_id, "fallida", metadatos, carpeta, bitacora)
         return bitacora.cerrar("fallida", {}, historial)
 
 

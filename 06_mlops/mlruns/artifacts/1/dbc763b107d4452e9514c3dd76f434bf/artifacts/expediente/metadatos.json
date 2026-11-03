@@ -1,17 +1,17 @@
 {
-  "run_id": "20261030T051523Z-f493-aa3ef0f",
+  "run_id": "20261103T032329Z-3399-descono",
   "destino": "Petén / Mundo Maya",
   "codigo_destino": "PETEN",
   "version_procedimiento": "1.0.0",
-  "commit_git": "aa3ef0f8453d70ae7d7013aa0052436e15291677-sucio",
+  "commit_git": "desconocido",
   "configuracion": {
     "archivo": "06_mlops/config/pipeline.yaml",
     "huella_sha256": "e1afcc4594b2cf50b3c132cf412e93296286b1369af44707ae937d385e3af49e"
   },
   "semilla": 20261029,
   "dependencias": {
-    "python": "3.13.5",
-    "plataforma": "Windows-11-10.0.26200-SP0",
+    "python": "3.12.16",
+    "plataforma": "Linux-6.18.54.1-microsoft-standard-WSL2-x86_64-with-glibc2.41",
     "pandas": "2.3.1",
     "numpy": "2.3.2",
     "statsmodels": "0.14.6",
@@ -54,7 +54,7 @@
   ],
   "fuente": {
     "nombre": "Base de Migración (fuente mensual)",
-    "ruta": "C:\\github\\CC3084-Data_Science\\data\\raw\\Base_Migracion_2009-2026jun.xlsx",
+    "ruta": "/app/data/raw/Base_Migracion_2009-2026jun.xlsx",
     "formato": "xlsx",
     "hoja": "Datos",
     "huella_sha256": "cdaba77918ae889c847ba8459503f9cce2441efac41b3d3aa0f05ac9ab283846",
@@ -96,12 +96,12 @@
     "modelo": "holt_winters",
     "detalle": "tendencia y estacionalidad aditivas, período 12",
     "parametros": {
-      "smoothing_level": 0.7633128557058552,
-      "smoothing_trend": 0.008642846514402058,
+      "smoothing_level": 0.7633018069795465,
+      "smoothing_trend": 0.008642091383368466,
       "smoothing_seasonal": 0.0,
       "damping_trend": null,
-      "initial_level": 18696.750067551628,
-      "initial_trend": -413.04493117789167,
+      "initial_level": 18696.758034625105,
+      "initial_trend": -413.0583543209989,
       "use_boxcox": 0.0,
       "remove_bias": 0.0
     },

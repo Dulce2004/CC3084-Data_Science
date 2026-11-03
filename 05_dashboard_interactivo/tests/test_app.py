@@ -8,7 +8,7 @@ import pytest
 from streamlit.testing.v1 import AppTest
 
 APP = str(Path(__file__).resolve().parents[1] / "src" / "app.py")
-PAGINAS = ["inicio", "panorama", "mercados", "entradas", "pronosticos", "glosario"]
+PAGINAS = ["inicio", "panorama", "mercados", "entradas", "pronosticos", "peten", "glosario"]
 
 
 def correr(pagina, **estado):

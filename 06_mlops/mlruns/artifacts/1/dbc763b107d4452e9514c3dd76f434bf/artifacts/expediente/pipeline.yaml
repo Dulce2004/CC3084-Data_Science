@@ -1,0 +1,120 @@
+# Configuración del flujo MLOps del Observatorio de Inteligencia Turística.
+# Laboratorio 11 — destino asignado: Petén / Mundo Maya.
+#
+# Todo lo que cambia entre ejecuciones vive aquí: rutas, períodos, parámetros del
+# procedimiento y umbrales de aceptación. El pipeline no lee ningún valor que no
+# esté en este archivo (ver src/config.py).
+
+version_procedimiento: "1.0.0"
+semilla: 20261029
+
+destino:
+  nombre: "Petén / Mundo Maya"
+  codigo: "PETEN"
+
+# ---------------------------------------------------------------- fuentes
+fuentes:
+  # Fuente institucional mensual. No se incluye en la imagen Docker: se monta
+  # o se apunta con la variable de entorno OBS_DATOS_CRUDOS.
+  migracion:
+    ruta: "data/raw/Base_Migracion_2009-2026jun.xlsx"
+    hoja: "Datos"
+    granularidad: "mes x vía x frontera x país x tipo de viajero"
+    columnas_requeridas:
+      Año: entero
+      Mes cod: entero
+      Vía: texto
+      Frontera: texto
+      País: texto
+      Región dos: texto
+      Tipo de Viajero: texto
+      Viajero: numerica
+    # Columnas que la fuente trae y el flujo no necesita. Se declaran para que el
+    # control 1 solo advierta cuando aparece una columna realmente nueva.
+    columnas_opcionales: ["Mes", "Región", "Regiones OMT", "MCEO", "Agrupación Residencia"]
+    # Columnas que pueden venir vacías sin impedir la estimación.
+    nulos_permitidos: ["País", "Región dos", "Región", "Regiones OMT", "MCEO", "Agrupación Residencia"]
+    # Clave que define la granularidad real de la fuente (control 3 de unicidad).
+    # 'Agrupación Residencia' forma parte de la clave: sin ella, 42 filas de 2020-2022
+    # aparecen como duplicadas porque el mismo país se reporta en dos agrupaciones de
+    # residencia distintas (ver README, hallazgos del avance).
+    clave: ["Año", "Mes cod", "Vía", "Frontera", "País", "Tipo de Viajero", "Agrupación Residencia"]
+
+# ---------------------------------------------------------------- procedimiento
+procedimiento:
+  modelo: "holt_winters"          # holt_winters | ses | seasonal_naive
+  referencia: "promedio_historico" # ultimo_valor | promedio_historico | seasonal_naive
+  periodo_estacional: 12
+
+  # Estimador del destino:
+  #   V(m) = D(m) + factor_reparto * A(m)
+  # D(m): entradas observadas en los puestos de entrada del propio destino.
+  # A(m): turistas que ingresan por La Aurora (vía aérea) y pueden continuar al destino.
+  puestos_destino: ["02 Mundo Maya", "17 El Naranjo", "18 Bethel", "20 Melchor de Mencos"]
+  tipos_destino: ["Turista", "Excursionista"]
+  puesto_reparto: "01 La Aurora"
+  tipos_reparto: ["Turista"]
+
+  # Supuesto del observatorio, no un parámetro estimado de los datos. Proporción de
+  # turistas llegados por vía aérea a La Aurora que visitan el destino. Valor
+  # provisional, pendiente de calibrar con el registro de visitantes del Parque
+  # Nacional Tikal (IDAEH). Se registra en los metadatos de cada ejecución.
+  factor_reparto: 0.12
+  factor_reparto_rango: [0.08, 0.18]   # sensibilidad reportada
+
+# ---------------------------------------------------------------- períodos
+periodos:
+  # Cobertura esperada de la fuente. Un mes dentro de este rango sin información
+  # NO se convierte en cero: se reporta como período sin cobertura.
+  cobertura_inicio: "2009-01"
+  cobertura_fin: "2026-06"
+
+  ajuste_inicio: "2009-01"
+  ajuste_fin: "2025-12"
+
+  # Meses con valor observado que se ocultan y se estiman como si no estuvieran
+  # disponibles (validación temporal: los parámetros se calculan solo con el ajuste).
+  evaluacion_inicio: "2026-01"
+  evaluacion_fin: "2026-06"
+
+# ---------------------------------------------------------------- aceptación
+# Regla de aceptación de una versión candidata. Se evalúa en este orden y basta
+# que una condición falle para rechazar la versión (ver src/evaluacion.py).
+aceptacion:
+  controles_criticos_sin_error: true      # ningún control crítico en estado error
+  salidas_completas: true                 # una fila por mes de evaluación, sin nulos
+  mae_max: 12000                          # viajeros/mes; ~6 % del volumen anual del destino
+  error_relativo_max: 0.35                # MAE / promedio observado del período evaluado
+  mejor_o_igual_que_referencia: false     # no es obligatorio superar la referencia
+  tolerancia_reproducibilidad: 1.0e-6     # diferencia máxima aceptada entre dos corridas
+
+# ---------------------------------------------------------------- controles
+# Nivel de cada control: "critico" detiene el pipeline antes de publicar;
+# "advertencia" se registra y deja continuar.
+controles:
+  columnas_tipos:        critico
+  fechas_cobertura:      critico
+  unicidad:              critico
+  valores_faltantes:     critico
+  valores_denominadores: critico
+  regla_metodologica:    critico
+  # Umbrales de los controles que admiten tolerancia.
+  umbrales:
+    max_prop_nulos_permitidos: 0.20   # advertencia si una columna opcional supera esto
+    max_meses_sin_cobertura: 0        # meses del rango de cobertura sin ninguna fila
+    max_prop_duplicados: 0.0
+
+# ---------------------------------------------------------------- monitoreo
+monitoreo:
+  mes_esperado: "2026-06"              # último mes que debe traer la fuente
+  variacion_mensual_max: 0.60          # |cambio| mes a mes que dispara alerta
+  variacion_interanual_max: 0.50       # |cambio| contra el mismo mes del año anterior
+
+# ---------------------------------------------------------------- salidas
+salidas:
+  resultados_dir: "06_mlops/data/resultados"
+  aprobado_dir: "06_mlops/data/aprobado"
+  logs_dir: "06_mlops/logs"
+  historial: "06_mlops/data/historial_ejecuciones.jsonl"
+  # Carpeta que lee el tablero (Laboratorio 10).
+  tablero_dir: "05_dashboard_interactivo/data/resultados"

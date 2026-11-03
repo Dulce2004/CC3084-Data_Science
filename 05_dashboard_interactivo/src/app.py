@@ -18,6 +18,7 @@ paginas = st.navigation({
     ],
     "Pronósticos": [
         st.Page("app_pages/pronosticos.py", title="Modelos de pronóstico", icon=":material/insights:"),
+        st.Page("app_pages/peten.py", title="Petén / Mundo Maya", icon=":material/park:"),
     ],
     "Ayuda": [st.Page("app_pages/glosario.py", title="Glosario y limitaciones", icon=":material/menu_book:")],
 })

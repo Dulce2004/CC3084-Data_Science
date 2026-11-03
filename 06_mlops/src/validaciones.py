@@ -303,7 +303,15 @@ def control_valores_denominadores(df: pd.DataFrame, cfg) -> Resultado:
                   "conteos no negativos y finitos; denominadores distintos de cero",
                   cfg.nivel_control("valores_denominadores"))
 
-    v = pd.to_numeric(df.get("Viajero"), errors="coerce")
+    requeridas = ["Viajero", "Frontera", "Tipo de Viajero", "Año", "Mes cod"]
+    faltan = [c for c in requeridas if c not in df.columns]
+    if faltan:
+        r.estado = ERROR
+        r.detalle = ("no se puede evaluar: faltan columnas que ya reportó el control 1: "
+                     + ", ".join(faltan))
+        return r
+
+    v = pd.to_numeric(df["Viajero"], errors="coerce")
     arr = v.to_numpy(dtype="float64", na_value=np.nan)
     negativos = int(np.nansum(arr < 0))
     no_finitos = int((~np.isfinite(arr)).sum())
